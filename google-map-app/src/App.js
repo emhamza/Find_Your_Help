@@ -1,40 +1,41 @@
 import React from 'react';
-import { GoogleMap, useLoadScript, Marker } from '@react-google-maps/api';
-
-const libraries = ['places'];
-const mapContainerStyle = {
-  width: '100vw',
-  height: '100vh',
-};
-const center = {
-  lat: 7.2905715, // default latitude
-  lng: 80.6337262, // default longitude
-};
+import { useState } from 'react';
+import {
+  APIProvider,
+  Map,
+  AdvancedMarker,
+  Pin,
+  InfoWindow
+} from '@vis.gl/react-google-maps';
 
 const App = () => {
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: 'Your-API-KEY',
-    libraries,
-  });
+  const position = { lat: 53.54, lng: 10 };
+  const [open, setOpen] = useState(false);
 
-  if (loadError) {
-    return <div>Error loading maps</div>;
-  }
+  const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+  const mapId = process.env.REACT_APP_GOOGLE_MAPS_MAP_ID;
 
-  if (!isLoaded) {
-    return <div>Loading maps</div>;
-  }
+  console.log("API Key:", apiKey);
+  console.log("Map ID:", mapId);
 
   return (
-    <div>
-      <GoogleMap
-        mapContainerStyle={mapContainerStyle}
-        zoom={10}
-        center={center}
-      >
-        <Marker position={center} />
-      </GoogleMap>
-    </div>
+    <APIProvider apiKey={apiKey}>
+      <div style={{ height: "100vh" }}>
+        <Map
+          zoom={9}
+          center={position}
+          mapId={mapId}
+        >
+          <AdvancedMarker position={position} onClick={() => setOpen(true)}>
+            <Pin background={"gray"} borderColor={'blue'} glyphColor={'yellow'} />
+          </AdvancedMarker>
+
+          {open && (<InfoWindow position={position} onCloseClick={() => setOpen(false)}>
+            <p>I am the info window</p>
+          </InfoWindow>)}
+        </Map>
+      </div>
+    </APIProvider>
   );
 };
 
